@@ -1,10 +1,21 @@
+import argparse
 import os
-import re
 import shutil
+import sys
 
+# rootDir = "/Users/ife/Documents/Android_Studio_Projects/AndroidProjectTemplateCopy"
+rootDir = "../"
 
-rootDir = "/Users/ife/Documents/Android_Studio_Projects/AndroidProjectTemplateCopy"
-userDefinedPackageName = "one.two.three.cheese"
+defaultPackageName = "com.ife.android_project_template"
+defaultProjectName = "MyAndroidProjectTemplate"
+parser = argparse.ArgumentParser(description = "")
+parser.add_argument("packageName", type=str, help="The package name in dot notation.", default=defaultPackageName)
+parser.add_argument("projectName", type=str, help="The project name", default=defaultProjectName)
+args = parser.parse_args()
+
+userDefinedPackageName = args.packageName # e.g one.two.three.cheese
+projectName = args.projectName
+
 listOfTargetFolders = ["main", "test", "androidTest"]
 
 def dumpFileTree():
@@ -59,9 +70,10 @@ def listKotlinGradleAndTomlFiles():
     print(projectTomlConfigFile)
     print("")
 
-def renamePackageNameInFiles(dotNotationPackageName):
+def renamePackageNameInFiles(dotNotationPackageName, userDefinedProjectName):
 
-    defaultPackageName = "com.ife.android_project_template"
+    # defaultPackageName = "com.ife.android_project_template"
+    # defaultProjectName = "AndroidProjectTemplate"
     kotlin_package_name_to_search = f"package {defaultPackageName}"
     importsToSearch = f"import {defaultPackageName}"
 
@@ -108,11 +120,31 @@ def renamePackageNameInFiles(dotNotationPackageName):
 
                     if defaultPackageName in file_contents:
                         file_contents = file_contents.replace(defaultPackageName, dotNotationPackageName)
-
                         print(f"Renamed package name in {gradleFile} with {dotNotationPackageName}")
 
                         with open(gradleFile, 'w') as f:
                             f.write(file_contents)
+
+                    if defaultProjectName in file_contents:
+                        file_contents = file_contents.replace(defaultProjectName, userDefinedProjectName)
+                        print(f"Renamed project name in {gradleFile} with {userDefinedProjectName}")
+
+                        with open(gradleFile, 'w') as f:
+                            f.write(file_contents)
+
+            if file.endswith(".xml"):
+                xmlFile = os.path.join(root, file)
+
+                with open(xmlFile, 'r') as f:
+                    file_contents = f.read()
+
+                    if defaultProjectName in file_contents:
+                        file_contents = file_contents.replace(defaultProjectName, userDefinedProjectName)
+                        print(f"Renamed app_name string in {xmlFile} with {userDefinedProjectName}")
+
+                        with open(xmlFile, 'w') as f:
+                            f.write(file_contents)
+
 
 def createFreshDirectories(sourceFolder, destinationFolder, deleteComFolderFor):
     print(f"Creating path: {destinationFolder}")
@@ -126,11 +158,19 @@ def createFreshDirectories(sourceFolder, destinationFolder, deleteComFolderFor):
             shutil.copytree(s, d, ignore_dangling_symlinks=True, dirs_exist_ok=True)
 
     # Delete the /com folder
-    print(f"Deleting /com folder for app/src/{deleteComFolderFor}")
-    shutil.rmtree(os.path.join(rootDir, f"app/src/{deleteComFolderFor}/java/com"))
+    # TODO if the user uses a package name like com.soup.whatever the /com will be deleted. Bug.
+    # print(f"Deleting /com folder for app/src/{deleteComFolderFor}")
+    #
+    # com_folder = os.path.join(rootDir, f"app/src/{deleteComFolderFor}/java/com")
+    # if os.path.isdir(com_folder) and 'android_project_template' in os.listdir(com_folder):
+    #     shutil.rmtree(com_folder)
+    #     print(f"Deleting {com_folder}")
+
+    # shutil.rmtree(os.path.join(rootDir, f"app/src/{deleteComFolderFor}/java/com"))
 
 def feedTargetFoldersForCreation(listOfFolders, dotNotationPackageName):
     for folder in listOfFolders:
+        print(f"folder -> {folder}")
         # src_folder = os.path.join(rootDir, f"app/src/main/java/com/ife/android_project_template")
         src_folder = os.path.join(rootDir, f"app/src/{folder}/java/com/ife/android_project_template")
         # dst_folder = os.path.join(rootDir, f"app/src/main/java/one.two.three.cheese)
@@ -145,7 +185,8 @@ feedTargetFoldersForCreation(
 )
 
 renamePackageNameInFiles(
-    dotNotationPackageName = userDefinedPackageName
+    dotNotationPackageName = userDefinedPackageName,
+    userDefinedProjectName = projectName
 )
 
 
