@@ -20,10 +20,18 @@ python customizer.py -packageName com.your.project [-appName YourAppName]
 #
 ##Notes
 
+First activate venv
+```
+source venv/bin/activate
+```
+
+Then do below
+
+
 [pyinstaller options](https://pyinstaller.org/en/v5.7.0/usage.html?highlight=target_arch#cmdoption-target-architecture
 )
 ----------
-pyinstaller command to compilefor Mac M1 
+pyinstaller command to compile for Mac M1 
 ```angular2html
 pyinstaller main.py --target-arch arm64 --distpath ./macM1Dist -y
 ```
