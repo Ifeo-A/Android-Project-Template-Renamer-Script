@@ -13,8 +13,10 @@ parser.add_argument("packageName", type=str, help="The package name in dot notat
 parser.add_argument("projectName", type=str, help="The project name", default=defaultProjectName)
 args = parser.parse_args()
 
-userDefinedPackageName = args.packageName # e.g one.two.three.cheese
+userDefinedPackageName:str = args.packageName # e.g one.two.three.cheese
 projectName = args.projectName
+
+packagePrefixTriggered:bool = False
 
 listOfTargetFolders = ["main", "test", "androidTest"]
 
@@ -23,6 +25,7 @@ def dumpFileTree():
         print(f"(dirs: {dirs}, files: {files})")
 
 def walkFromSourceDirectory(source):
+    print(f"Directory walk from {source}")
     for root, dirs, files in os.walk(source):
         for dir in dirs:
             print(os.path.join(root, dir))
@@ -145,9 +148,9 @@ def renamePackageNameInFiles(dotNotationPackageName, userDefinedProjectName):
                         with open(xmlFile, 'w') as f:
                             f.write(file_contents)
 
-
-def createFreshDirectories(sourceFolder, destinationFolder, deleteComFolderFor):
+def createFreshDirectories(sourceFolder:str, destinationFolder:str, deleteComFolderFor:str):
     print(f"Creating path: {destinationFolder}")
+
     os.makedirs(destinationFolder, exist_ok=True)
     for item in os.scandir(sourceFolder):
         s = os.path.join(sourceFolder, item.name)
@@ -157,18 +160,46 @@ def createFreshDirectories(sourceFolder, destinationFolder, deleteComFolderFor):
         elif item.is_dir():
             shutil.copytree(s, d, ignore_dangling_symlinks=True, dirs_exist_ok=True)
 
-    # Delete the /com folder
-    # TODO if the user uses a package name like com.soup.whatever the /com will be deleted. Bug.
-    # print(f"Deleting /com folder for app/src/{deleteComFolderFor}")
-    #
-    # com_folder = os.path.join(rootDir, f"app/src/{deleteComFolderFor}/java/com")
-    # if os.path.isdir(com_folder) and 'android_project_template' in os.listdir(com_folder):
-    #     shutil.rmtree(com_folder)
-    #     print(f"Deleting {com_folder}")
+    # Delete the original /com path as its not needed
+    print(f"Deleting /com folder for app/src/{deleteComFolderFor}")
+    com_folder = os.path.join(rootDir, f"app/src/{deleteComFolderFor}/java/com")
+    if os.path.isdir(com_folder) and 'android_project_template' in os.listdir(com_folder):
+        shutil.rmtree(com_folder)
+        print(f"Deleting {com_folder}")
 
-    # shutil.rmtree(os.path.join(rootDir, f"app/src/{deleteComFolderFor}/java/com"))
+    shutil.rmtree(os.path.join(rootDir, f"app/src/{deleteComFolderFor}/java/com"))
+    print(f"Deleted the com folder --> app/src/{deleteComFolderFor}/java/com")
+
+    # Rename destination folder to remove the "mycom" prefix to change it to start with "com" instead
+    # if packagePrefixTriggered:
+    #     print("Renaming `mycom` to `com`")
+    #
+    #     newPathName = destinationFolder.replace("mycom", "com")
+    #
+    #     print(f"Destination path ({destinationFolder}) exists? {os.path.exists(destinationFolder)} ")
+    #     print(f"New path exists? {os.path.exists(newPathName)} ")
+    #
+    #     # New Path should not exist yet because it's not been created yet.
+    #     print(f"Destination path: {destinationFolder}")
+    #     print(f"New path: {newPathName}")
+    #
+    #     # os.rename(
+    #     #     destinationFolder,
+    #     #     newPathName
+    #     # )
+    #
+    #     os.rename(
+    #         os.path.join(destinationFolder),
+    #         os.path.join(newPathName)
+    #     )
 
 def feedTargetFoldersForCreation(listOfFolders, dotNotationPackageName):
+    # if the package name starts with com then replace it with a prefix
+    if dotNotationPackageName.split(".")[0] == "com":
+        global packagePrefixTriggered
+        packagePrefixTriggered = True
+        dotNotationPackageName = dotNotationPackageName.replace("com", "mycom")
+
     for folder in listOfFolders:
         print(f"folder -> {folder}")
         # src_folder = os.path.join(rootDir, f"app/src/main/java/com/ife/android_project_template")
@@ -176,7 +207,6 @@ def feedTargetFoldersForCreation(listOfFolders, dotNotationPackageName):
         # dst_folder = os.path.join(rootDir, f"app/src/main/java/one.two.three.cheese)
         dst_folder = os.path.join(rootDir, f"app/src/{folder}/java/{dotNotationPackageName.replace('.', os.sep)}")
         createFreshDirectories(sourceFolder = src_folder, destinationFolder = dst_folder, deleteComFolderFor = folder)
-
 
 
 feedTargetFoldersForCreation(
