@@ -2,7 +2,8 @@ import argparse
 import os
 import shutil
 
-rootDir = os.getcwd()
+rootDir = os.path.join(os.getcwd(), "../")
+print(f"\nrootDir: {rootDir} \n")
 
 defaultPackageName:str = "com.ife.android_project_template"
 defaultAppName:str = "AndroidProjectTemplate"
@@ -98,7 +99,7 @@ def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:
 
 def createFreshDirectories(sourceFolder:str, destinationFolder:str, deleteComFolderFor:str):
     print(f"SourceFolder path: {sourceFolder}")
-    print(f"Creating path: {destinationFolder}")
+    print(f"Creating path: {destinationFolder} \n")
 
     os.makedirs(destinationFolder, exist_ok=True)
     for item in os.scandir(sourceFolder):
@@ -117,7 +118,7 @@ def createFreshDirectories(sourceFolder:str, destinationFolder:str, deleteComFol
         print(f"Deleting {com_folder}")
 
     shutil.rmtree(os.path.join(rootDir, f"app/src/{deleteComFolderFor}/java/com"))
-    print(f"Deleted the com folder --> app/src/{deleteComFolderFor}/java/com")
+    print(f"Deleted the com folder --> app/src/{deleteComFolderFor} \n")
 
     # Rename destination folder to remove the "mycom" prefix to change it to start with "com" instead
     if packagePrefixTriggered:
@@ -140,10 +141,15 @@ def feedTargetFoldersForCreation(listOfFolders:list, dotNotationPackageName:str)
         dotNotationPackageName = dotNotationPackageName.replace("com", tempPackagePrefix)
 
     for folder in listOfFolders:
+
         src_folder = os.path.join(rootDir, f"app/src/{folder}/java/com/ife/android_project_template")
+        if not os.path.exists(src_folder):
+            os.makedirs(src_folder, exist_ok=True)
+        else:
+            Exception(f"could not create folder: {src_folder}")
+
         dst_folder = os.path.join(rootDir, f"app/src/{folder}/java/{dotNotationPackageName.replace('.', os.sep)}")
         createFreshDirectories(sourceFolder = src_folder, destinationFolder = dst_folder, deleteComFolderFor = folder)
-
 
 feedTargetFoldersForCreation(
     listOfFolders = listOfTargetFolders,

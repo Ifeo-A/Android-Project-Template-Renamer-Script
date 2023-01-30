@@ -17,5 +17,30 @@ or
 python customizer.py -packageName com.your.project [-appName YourAppName]
 ```
 
+#
+##Notes
+
+[pyinstaller options](https://pyinstaller.org/en/v5.7.0/usage.html?highlight=target_arch#cmdoption-target-architecture
+)
+----------
+pyinstaller command to compilefor Mac M1 
+```angular2html
+pyinstaller main.py --target-arch arm64 --distpath ./macM1Dist -y
+```
+
+pyinstaller command to compile for Mac Intel
+```
+pyinstaller main.py --target-arch x86_64 --distpath ./macIntelDist -y
+```
+
+pyinstaller command to compile for windows
+```
+pyinstaller main.py --distpath ./windowsDist -y
+
+```
+
+
+
+
 
 
