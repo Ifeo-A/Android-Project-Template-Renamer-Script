@@ -2,17 +2,16 @@ import argparse
 import os
 import shutil
 
-# rootDir = "/Users/ife/Documents/Android_Studio_Projects/AndroidProjectTemplateCopy"
-rootDir = "../"
+rootDir = os.getcwd()
 
 defaultPackageName:str = "com.ife.android_project_template"
 defaultAppName:str = "AndroidProjectTemplate"
 listOfTargetFolders:list = ["main", "test", "androidTest"]
 tempPackagePrefix:str = "mycom"
 
-# usage -p ife.com.myapp -a MyAppName (The app name is optional)
+# usage -p com.your.appname -a YourAppName (The app name is optional)
 # or
-# usage --packageName ife.com.myapp -appName MyAppName (The app name is optional)
+# usage --packageName com.your.appname -appName YourAppName (The app name is optional)
 parser = argparse.ArgumentParser(description = "")
 parser.add_argument("-p", "--packageName", type=str, help="The package name in dot notation e.g com.my.project", required=True)
 parser.add_argument("-a", "--appName", type=str, help="The project name e.g MyCatApp", default=defaultAppName)
@@ -26,8 +25,6 @@ packagePrefixTriggered:bool = False
 
 def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:str):
 
-    # defaultPackageName = "com.ife.android_project_template"
-    # defaultAppName = "AndroidProjectTemplate"
     kotlin_package_name_to_search = f"package {defaultPackageName}"
     importsToSearch = f"import {defaultPackageName}"
 
@@ -100,6 +97,7 @@ def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:
                             f.write(file_contents)
 
 def createFreshDirectories(sourceFolder:str, destinationFolder:str, deleteComFolderFor:str):
+    print(f"SourceFolder path: {sourceFolder}")
     print(f"Creating path: {destinationFolder}")
 
     os.makedirs(destinationFolder, exist_ok=True)
@@ -156,3 +154,7 @@ renamePackageNameInFiles(
     dotNotationPackageName = userDefinedPackageName,
     userDefinedProjectName = appName
 )
+
+# Delete the folder that contains this script
+shutil.rmtree(os.path.join(rootDir, f"project_customizer"))
+print("Deleted project_customizer folder")
