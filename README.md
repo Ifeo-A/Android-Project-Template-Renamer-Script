@@ -1,6 +1,6 @@
 # Android project file customizer
 
-A pythin script to customize the android project files. It replaces the default package and application name with what you provide. 
+A python script to customize the android project files. It replaces the default package and application name with what you provide. 
 The Android project template can be found [here](https://github.com/Ifeo-A/AndroidProjectTemplate).
 
 
