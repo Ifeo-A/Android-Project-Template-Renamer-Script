@@ -6,16 +6,36 @@ The Android project template can be found [here](https://github.com/Ifeo-A/Andro
 
 ## Usage/Examples
 
-Prerequisites:
-- The script has been tested on python 3. You should have at least Python 3 installed
+These do not need to run in a virtual environment.
 
-```python
-python customizer.py -p com.your.project [-a YourAppName]
+If you're on an Intel Mac then run
+```
+macIntelDist/main/main -p com.your.project [-a YourAppName]
 ```
 or
 ```
-python customizer.py -packageName com.your.project [-appName YourAppName]
+macIntelDist/main/main -packageName com.your.project [-appName YourAppName]
 ```
+
+If you're on an M1 Mac then run
+```
+macM1Dist/main/main -p com.your.project [-a YourAppName]
+```
+or
+```
+macM1Dist/main/main -packageName com.your.project [-appName YourAppName]
+```
+
+If you're on Windows then run
+```
+windowsDist/main/main -p com.your.project [-a YourAppName]
+```
+or
+```
+windowsDist/main/main -packageName com.your.project [-appName YourAppName]
+```
+
+
 
 #
 ##Notes
@@ -31,21 +51,21 @@ Then do below
 [pyinstaller options](https://pyinstaller.org/en/v5.7.0/usage.html?highlight=target_arch#cmdoption-target-architecture
 )
 ----------
-pyinstaller command to compile for Mac M1 
+pyinstaller command to compile for Mac M1  (Need to run this on a Mac computer)
 ```angular2html
 pyinstaller main.py --target-arch arm64 --distpath ./macM1Dist -y
 ```
 
-pyinstaller command to compile for Mac Intel
+pyinstaller command to compile for Mac Intel (Need to run this on a Mac computer)
 ```
 pyinstaller main.py --target-arch x86_64 --distpath ./macIntelDist -y
 ```
 
-pyinstaller command to compile for windows
+pyinstaller command to compile for windows (Need to run this on a Windows computer)
 ```
 pyinstaller main.py --distpath ./windowsDist -y
-
 ```
+
 
 
 
