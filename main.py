@@ -23,60 +23,8 @@ appName = args.appName
 
 packagePrefixTriggered:bool = False
 
-def dumpFileTree():
-    for root, dirs, files in os.walk(rootDir):
-        print(f"(dirs: {dirs}, files: {files})")
 
-def walkFromSourceDirectory(source):
-    print(f"Directory walk from {source}")
-    for root, dirs, files in os.walk(source):
-        for dir in dirs:
-            print(os.path.join(root, dir))
-
-def listKotlinGradleAndTomlFiles():
-    listOfKotlinFiles = []
-    listOfPureGradleFiles = []
-    listOfKotlinGradleFiles = []
-    projectTomlConfigFile = ""
-
-    for root, dirs, files in os.walk(rootDir):
-        for file in files:
-            if file.endswith(".kt"):
-                kotlinFilePath = os.path.join(root, file)
-                listOfKotlinFiles.append(kotlinFilePath)
-
-            if file.endswith(".gradle"):
-                pureGradlePath = os.path.join(root, file)
-                listOfPureGradleFiles.append(pureGradlePath)
-
-            if file.endswith(".gradle.kts"):
-                kotlinGradlePath = os.path.join(root, file)
-                listOfKotlinGradleFiles.append(kotlinGradlePath)
-
-            if file.endswith("myproject.config.toml"):
-                projectTomlConfigFile = os.path.join(root, file)
-
-
-    print(f'Found kotlin files ', end="\n")
-    for file in listOfKotlinFiles:
-        print(file)
-    print("")
-
-    print(f'Found pure gradle files ', end="\n")
-    for file in listOfPureGradleFiles:
-        print(file)
-    print("")
-
-    print(f'Found kotlin gradle files ', end="\n")
-    for file in listOfKotlinGradleFiles:
-        print(file)
-    print("")
-
-    print(f'Found project toml config file ', end="\n")
-    print(projectTomlConfigFile)
-    print("")
-
-def renamePackageNameInFiles(dotNotationPackageName, userDefinedProjectName):
+def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:str):
 
     # defaultPackageName = "com.ife.android_project_template"
     # defaultAppName = "AndroidProjectTemplate"
@@ -181,7 +129,7 @@ def createFreshDirectories(sourceFolder:str, destinationFolder:str, deleteComFol
 
         os.renames(destinationFolder, newPathName)
 
-def feedTargetFoldersForCreation(listOfFolders, dotNotationPackageName):
+def feedTargetFoldersForCreation(listOfFolders:list, dotNotationPackageName:str):
     # If the user uses com to start the package name e.g com.this.that then
     # rename the first part "com" to "mycom" so the package name now looks like this: "mycom.this.that"
     # create the "mycom" folder and then later delete the original "com" folder that existed
@@ -208,8 +156,3 @@ renamePackageNameInFiles(
     dotNotationPackageName = userDefinedPackageName,
     userDefinedProjectName = appName
 )
-
-
-# dumpFileTree()
-# listKotlinGradleAndTomlFiles()
-# walkFromSourceDirectory("/Users/ife/Documents/Android_Studio_Projects/AndroidProjectTemplateCopy/app/src")
