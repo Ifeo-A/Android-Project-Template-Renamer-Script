@@ -1,24 +1,27 @@
 import argparse
 import os
 import shutil
-import sys
 
 # rootDir = "/Users/ife/Documents/Android_Studio_Projects/AndroidProjectTemplateCopy"
 rootDir = "../"
 
-defaultPackageName = "com.ife.android_project_template"
-defaultProjectName = "MyAndroidProjectTemplate"
+defaultPackageName:str = "com.ife.android_project_template"
+defaultAppName:str = "AndroidProjectTemplate"
+listOfTargetFolders:list = ["main", "test", "androidTest"]
+tempPackagePrefix:str = "mycom"
+
+# usage -p ife.com.myapp -a MyAppName (The app name is optional)
+# or
+# usage --packageName ife.com.myapp -appName MyAppName (The app name is optional)
 parser = argparse.ArgumentParser(description = "")
-parser.add_argument("packageName", type=str, help="The package name in dot notation.", default=defaultPackageName)
-parser.add_argument("projectName", type=str, help="The project name", default=defaultProjectName)
+parser.add_argument("-p", "--packageName", type=str, help="The package name in dot notation e.g com.my.project", required=True)
+parser.add_argument("-a", "--appName", type=str, help="The project name e.g MyCatApp", default=defaultAppName)
 args = parser.parse_args()
 
-userDefinedPackageName:str = args.packageName # e.g one.two.three.cheese
-projectName = args.projectName
+userDefinedPackageName:str = args.packageName.lower() # e.g one.two.three.cheese
+appName = args.appName
 
 packagePrefixTriggered:bool = False
-
-listOfTargetFolders = ["main", "test", "androidTest"]
 
 def dumpFileTree():
     for root, dirs, files in os.walk(rootDir):
@@ -76,7 +79,7 @@ def listKotlinGradleAndTomlFiles():
 def renamePackageNameInFiles(dotNotationPackageName, userDefinedProjectName):
 
     # defaultPackageName = "com.ife.android_project_template"
-    # defaultProjectName = "AndroidProjectTemplate"
+    # defaultAppName = "AndroidProjectTemplate"
     kotlin_package_name_to_search = f"package {defaultPackageName}"
     importsToSearch = f"import {defaultPackageName}"
 
@@ -128,8 +131,8 @@ def renamePackageNameInFiles(dotNotationPackageName, userDefinedProjectName):
                         with open(gradleFile, 'w') as f:
                             f.write(file_contents)
 
-                    if defaultProjectName in file_contents:
-                        file_contents = file_contents.replace(defaultProjectName, userDefinedProjectName)
+                    if defaultAppName in file_contents:
+                        file_contents = file_contents.replace(defaultAppName, userDefinedProjectName)
                         print(f"Renamed project name in {gradleFile} with {userDefinedProjectName}")
 
                         with open(gradleFile, 'w') as f:
@@ -141,8 +144,8 @@ def renamePackageNameInFiles(dotNotationPackageName, userDefinedProjectName):
                 with open(xmlFile, 'r') as f:
                     file_contents = f.read()
 
-                    if defaultProjectName in file_contents:
-                        file_contents = file_contents.replace(defaultProjectName, userDefinedProjectName)
+                    if defaultAppName in file_contents:
+                        file_contents = file_contents.replace(defaultAppName, userDefinedProjectName)
                         print(f"Renamed app_name string in {xmlFile} with {userDefinedProjectName}")
 
                         with open(xmlFile, 'w') as f:
@@ -171,40 +174,27 @@ def createFreshDirectories(sourceFolder:str, destinationFolder:str, deleteComFol
     print(f"Deleted the com folder --> app/src/{deleteComFolderFor}/java/com")
 
     # Rename destination folder to remove the "mycom" prefix to change it to start with "com" instead
-    # if packagePrefixTriggered:
-    #     print("Renaming `mycom` to `com`")
-    #
-    #     newPathName = destinationFolder.replace("mycom", "com")
-    #
-    #     print(f"Destination path ({destinationFolder}) exists? {os.path.exists(destinationFolder)} ")
-    #     print(f"New path exists? {os.path.exists(newPathName)} ")
-    #
-    #     # New Path should not exist yet because it's not been created yet.
-    #     print(f"Destination path: {destinationFolder}")
-    #     print(f"New path: {newPathName}")
-    #
-    #     # os.rename(
-    #     #     destinationFolder,
-    #     #     newPathName
-    #     # )
-    #
-    #     os.rename(
-    #         os.path.join(destinationFolder),
-    #         os.path.join(newPathName)
-    #     )
+    if packagePrefixTriggered:
+        print(f"Renaming \"{tempPackagePrefix}\" to \"com\" ")
+
+        newPathName = destinationFolder.replace(tempPackagePrefix, "com")
+
+        os.renames(destinationFolder, newPathName)
 
 def feedTargetFoldersForCreation(listOfFolders, dotNotationPackageName):
-    # if the package name starts with com then replace it with a prefix
+    # If the user uses com to start the package name e.g com.this.that then
+    # rename the first part "com" to "mycom" so the package name now looks like this: "mycom.this.that"
+    # create the "mycom" folder and then later delete the original "com" folder that existed
+    # before the user ran the script.
+
+    # if the package name starts with com then replace it with a prefix and set prefix triggered flag
     if dotNotationPackageName.split(".")[0] == "com":
         global packagePrefixTriggered
         packagePrefixTriggered = True
-        dotNotationPackageName = dotNotationPackageName.replace("com", "mycom")
+        dotNotationPackageName = dotNotationPackageName.replace("com", tempPackagePrefix)
 
     for folder in listOfFolders:
-        print(f"folder -> {folder}")
-        # src_folder = os.path.join(rootDir, f"app/src/main/java/com/ife/android_project_template")
         src_folder = os.path.join(rootDir, f"app/src/{folder}/java/com/ife/android_project_template")
-        # dst_folder = os.path.join(rootDir, f"app/src/main/java/one.two.three.cheese)
         dst_folder = os.path.join(rootDir, f"app/src/{folder}/java/{dotNotationPackageName.replace('.', os.sep)}")
         createFreshDirectories(sourceFolder = src_folder, destinationFolder = dst_folder, deleteComFolderFor = folder)
 
@@ -216,9 +206,8 @@ feedTargetFoldersForCreation(
 
 renamePackageNameInFiles(
     dotNotationPackageName = userDefinedPackageName,
-    userDefinedProjectName = projectName
+    userDefinedProjectName = appName
 )
-
 
 
 # dumpFileTree()
