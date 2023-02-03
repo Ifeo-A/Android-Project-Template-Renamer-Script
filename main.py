@@ -7,7 +7,8 @@ print(f"\nrootDir: {rootDir} \n")
 
 defaultPackageName:str = "com.ife.android_project_template"
 defaultAppName:str = "AndroidProjectTemplate"
-listOfTargetFolders:list = ["main", "test", "androidTest"]
+listOfTargetRootFolders:list = ["app", "core-resource", "core-ui", "core-utils", "feature-example-main-screen", "feature-example-secondary-screen"]
+listOfTargetSrcFolders:list = ["main", "test", "androidTest"]
 tempPackagePrefix:str = "mycom"
 
 # usage -p com.your.appname -a YourAppName (The app name is optional)
@@ -97,7 +98,7 @@ def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:
                         with open(xmlFile, 'w') as f:
                             f.write(file_contents)
 
-def createFreshDirectories(sourceFolder:str, destinationFolder:str, deleteComFolderFor:str):
+def createFreshDirectories(rootFolder:str, sourceFolder:str, destinationFolder:str, deleteComFolderFor:str):
     print(f"SourceFolder path: {sourceFolder}")
     print(f"Creating path: {destinationFolder} \n")
 
@@ -111,14 +112,15 @@ def createFreshDirectories(sourceFolder:str, destinationFolder:str, deleteComFol
             shutil.copytree(s, d, ignore_dangling_symlinks=True, dirs_exist_ok=True)
 
     # Delete the original /com path as its not needed
-    print(f"Deleting /com folder for app/src/{deleteComFolderFor}")
-    com_folder = os.path.join(rootDir, f"app/src/{deleteComFolderFor}/java/com")
+    print(f"Deleting /com folder for {rootFolder}/src/{deleteComFolderFor}")
+    com_folder = os.path.join(rootDir, f"{rootFolder}/src/{deleteComFolderFor}/java/com")
     if os.path.isdir(com_folder) and 'android_project_template' in os.listdir(com_folder):
         shutil.rmtree(com_folder)
         print(f"Deleting {com_folder}")
 
-    shutil.rmtree(os.path.join(rootDir, f"app/src/{deleteComFolderFor}/java/com"))
-    print(f"Deleted the com folder --> app/src/{deleteComFolderFor} \n")
+    if os.path.exists(com_folder):
+        shutil.rmtree(com_folder)
+        print(f"Deleted the com folder --> {rootFolder}/src/{deleteComFolderFor} \n")
 
     # Rename destination folder to remove the "mycom" prefix to change it to start with "com" instead
     if packagePrefixTriggered:
@@ -128,7 +130,7 @@ def createFreshDirectories(sourceFolder:str, destinationFolder:str, deleteComFol
 
         os.renames(destinationFolder, newPathName)
 
-def feedTargetFoldersForCreation(listOfFolders:list, dotNotationPackageName:str):
+def feedTargetFoldersForCreation(listOfTargetSourceFolders:list, dotNotationPackageName:str):
     # If the user uses com to start the package name e.g com.this.that then
     # rename the first part "com" to "mycom" so the package name now looks like this: "mycom.this.that"
     # create the "mycom" folder and then later delete the original "com" folder that existed
@@ -140,19 +142,19 @@ def feedTargetFoldersForCreation(listOfFolders:list, dotNotationPackageName:str)
         packagePrefixTriggered = True
         dotNotationPackageName = dotNotationPackageName.replace("com", tempPackagePrefix)
 
-    for folder in listOfFolders:
+    for rootFolder in listOfTargetRootFolders:
+        for folder in listOfTargetSourceFolders:
+            src_folder = os.path.join(rootDir, f"{rootFolder}/src/{folder}/java/com/ife/android_project_template")
+            if not os.path.exists(src_folder):
+                os.makedirs(src_folder, exist_ok=True)
+            else:
+                Exception(f"could not create folder: {src_folder}")
 
-        src_folder = os.path.join(rootDir, f"app/src/{folder}/java/com/ife/android_project_template")
-        if not os.path.exists(src_folder):
-            os.makedirs(src_folder, exist_ok=True)
-        else:
-            Exception(f"could not create folder: {src_folder}")
-
-        dst_folder = os.path.join(rootDir, f"app/src/{folder}/java/{dotNotationPackageName.replace('.', os.sep)}")
-        createFreshDirectories(sourceFolder = src_folder, destinationFolder = dst_folder, deleteComFolderFor = folder)
+            dst_folder = os.path.join(rootDir, f"{rootFolder}/src/{folder}/java/{dotNotationPackageName.replace('.', os.sep)}")
+            createFreshDirectories(rootFolder = rootFolder, sourceFolder = src_folder, destinationFolder = dst_folder, deleteComFolderFor = folder)
 
 feedTargetFoldersForCreation(
-    listOfFolders = listOfTargetFolders,
+    listOfTargetSourceFolders= listOfTargetSrcFolders,
     dotNotationPackageName = userDefinedPackageName
 )
 
