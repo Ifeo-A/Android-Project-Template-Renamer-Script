@@ -2,7 +2,7 @@ import argparse
 import os
 import shutil
 
-rootDir = os.path.join(os.getcwd(), "../")
+rootDir = os.path.join(os.getcwd())
 print(f"\nrootDir: {rootDir} \n")
 
 defaultPackageName:str = "com.ife.android_project_template"
