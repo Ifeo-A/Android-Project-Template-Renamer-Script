@@ -165,4 +165,8 @@ renamePackageNameInFiles(
 
 # Delete the folder that contains this script
 shutil.rmtree(os.path.join(rootDir, f"project_customizer"))
+# Delete additional files
+shutil.rmtree(os.path.join(rootDir, f".git"))
+shutil.rmtree(os.path.join(rootDir, f".github"))
+
 print("Deleted project_customizer folder")
