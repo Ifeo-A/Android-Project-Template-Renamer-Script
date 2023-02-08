@@ -7,7 +7,7 @@ print(f"\nrootDir: {rootDir} \n")
 
 defaultPackageName:str = "com.ife.android_project_template"
 defaultAppName:str = "AndroidProjectTemplate"
-listOfTargetRootFolders:list = ["app", "core-resource", "core-ui", "core-utils", "feature-example-main-screen", "feature-example-secondary-screen"]
+listOfTargetRootFolders:list = ["app", "core-resource", "core-ui", "core-utils", "preview-resource", "feature-example-main-screen", "feature-example-secondary-screen"]
 listOfTargetSrcFolders:list = ["main", "test", "androidTest"]
 tempPackagePrefix:str = "mycom"
 
