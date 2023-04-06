@@ -7,6 +7,7 @@ print(f"\nrootDir: {rootDir} \n")
 
 defaultPackageName:str = "com.ife.android_project_template"
 defaultAppName:str = "AndroidProjectTemplate"
+applicationClassNameInAndroidProject = "AndroidProjectTemplateApplication"
 listOfTargetRootFolders:list = ["app", "core-resource", "core-ui", "core-utils", "preview-resource", "feature-example-main-screen", "feature-example-secondary-screen"]
 listOfTargetSrcFolders:list = ["main", "test", "androidTest"]
 tempPackagePrefix:str = "mycom"
@@ -30,8 +31,30 @@ def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:
     kotlin_package_name_to_search = f"package {defaultPackageName}"
     importsToSearch = f"import {defaultPackageName}"
 
+    # What does this code do?
+    # 1. It renames the package name in all the kotlin files
+    # 2. It renames the package name in the project.toml file
     for root, dirs, files in os.walk(rootDir):
         for file in files:
+
+            # If file name is "AndroidProjectTemplateApplication" then rename it to the user defined project name and add "Application" to the end. Then rename the class name in the file to the project name
+            if file.endswith(f"{applicationClassNameInAndroidProject}.kt"):
+                applicationFilePath = os.path.join(root, file)
+
+                # What does this code do?
+                # 1. It renames the class name in the file to the project name
+                with open(applicationFilePath, 'r') as f:
+                    file_contents = f.read()
+
+                    # If the file contains the default application class name then rename it to the user defined project name and add "Application" to the end
+                    if applicationClassNameInAndroidProject in file_contents:
+                        file_contents = file_contents.replace(applicationClassNameInAndroidProject, f'{userDefinedProjectName}Application')
+
+                        print(f"Renamed class name in {applicationFilePath} with {userDefinedProjectName}Application")
+
+                        with open(applicationFilePath, 'w') as f:
+                            f.write(file_contents)
+
 
             if file.endswith(".kt"):
                 kotlinFilePath = os.path.join(root, file)
