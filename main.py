@@ -31,20 +31,10 @@ def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:
     kotlin_package_name_to_search = f"package {defaultPackageName}"
     importsToSearch = f"import {defaultPackageName}"
 
-    # What does this code do?
     # 1. It renames the package name in all the kotlin files
     # 2. It renames the package name in the project.toml file
     for root, dirs, files in os.walk(rootDir):
         for file in files:
-
-            # Rename the file with defaultApplicationClassNameInAndroidProject to the project name and add "Application" to the end
-            # if file.endswith(f"{defaultApplicationClassNameInAndroidProject}.kt"):
-            #     applicationFilePath = os.path.join(root, file)
-            #     newApplicationFilePath = os.path.join(root, f"{userDefinedProjectName}Application.kt")
-            #
-            #     os.rename(applicationFilePath, newApplicationFilePath)
-            #
-            #     print(f"Renamed {applicationFilePath} to {newApplicationFilePath}")
 
             # Rename the class name in the file to the project name
             if file.endswith(f"{defaultApplicationClassNameInAndroidProject}.kt"):
