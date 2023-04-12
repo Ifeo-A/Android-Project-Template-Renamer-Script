@@ -7,6 +7,7 @@ print(f"\nrootDir: {rootDir} \n")
 
 defaultPackageName:str = "com.ife.android_project_template"
 defaultAppName:str = "AndroidProjectTemplate"
+defaultApplicationClassNameInAndroidProject = "AndroidProjectTemplateApplication"
 listOfTargetRootFolders:list = ["app", "core-resource", "core-ui", "core-utils", "preview-resource", "feature-example-main-screen", "feature-example-secondary-screen"]
 listOfTargetSrcFolders:list = ["main", "test", "androidTest"]
 tempPackagePrefix:str = "mycom"
@@ -30,8 +31,29 @@ def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:
     kotlin_package_name_to_search = f"package {defaultPackageName}"
     importsToSearch = f"import {defaultPackageName}"
 
+    # 1. It renames the package name in all the kotlin files
+    # 2. It renames the package name in the project.toml file
     for root, dirs, files in os.walk(rootDir):
         for file in files:
+
+            # Rename the class name in the file to the project name
+            if file.endswith(f"{defaultApplicationClassNameInAndroidProject}.kt"):
+                applicationFilePath = os.path.join(root, file)
+
+                # What does this code do?
+                # 1. It renames the class name in the file to the project name
+                with open(applicationFilePath, 'r') as f:
+                    file_contents = f.read()
+
+                    # If the file contains the default application class name then rename it to the user defined project name and add "Application" to the end
+                    if defaultApplicationClassNameInAndroidProject in file_contents:
+                        file_contents = file_contents.replace(defaultApplicationClassNameInAndroidProject, f'{userDefinedProjectName}Application')
+
+                        print(f"Renamed class name in {applicationFilePath} with {userDefinedProjectName}Application")
+
+                        with open(applicationFilePath, 'w') as f:
+                            f.write(file_contents)
+
 
             if file.endswith(".kt"):
                 kotlinFilePath = os.path.join(root, file)
@@ -98,6 +120,21 @@ def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:
                         with open(xmlFile, 'w') as f:
                             f.write(file_contents)
 
+def renameApplicationClassFileName(userDefinedProjectName:str):
+
+    print(f"Renaming application class file name to {userDefinedProjectName}Application.kt")
+    for root, dirs, files in os.walk(rootDir):
+        for file in files:
+
+            if file.endswith(f"{defaultApplicationClassNameInAndroidProject}.kt"):
+                applicationFilePath = os.path.join(root, file)
+                newApplicationFilePath = os.path.join(root, f"{userDefinedProjectName}Application.kt")
+
+                os.rename(applicationFilePath, newApplicationFilePath)
+
+                print(f"Renamed {applicationFilePath} to {newApplicationFilePath}")
+
+
 def createFreshDirectories(rootFolder:str, sourceFolder:str, destinationFolder:str, deleteComFolderFor:str):
     print(f"SourceFolder path: {sourceFolder}")
     print(f"Creating path: {destinationFolder} \n")
@@ -161,6 +198,10 @@ feedTargetFoldersForCreation(
 renamePackageNameInFiles(
     dotNotationPackageName = userDefinedPackageName,
     userDefinedProjectName = appName
+)
+
+renameApplicationClassFileName(
+    userDefinedProjectName=appName
 )
 
 # Delete the folder that contains this script
