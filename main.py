@@ -7,7 +7,7 @@ print(f"\nrootDir: {rootDir} \n")
 
 defaultPackageName:str = "com.ife.android_project_template"
 defaultAppName:str = "AndroidProjectTemplate"
-applicationClassNameInAndroidProject = "AndroidProjectTemplateApplication"
+defaultApplicationClassNameInAndroidProject = "AndroidProjectTemplateApplication"
 listOfTargetRootFolders:list = ["app", "core-resource", "core-ui", "core-utils", "preview-resource", "feature-example-main-screen", "feature-example-secondary-screen"]
 listOfTargetSrcFolders:list = ["main", "test", "androidTest"]
 tempPackagePrefix:str = "mycom"
@@ -37,8 +37,17 @@ def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:
     for root, dirs, files in os.walk(rootDir):
         for file in files:
 
-            # If file name is "AndroidProjectTemplateApplication" then rename it to the user defined project name and add "Application" to the end. Then rename the class name in the file to the project name
-            if file.endswith(f"{applicationClassNameInAndroidProject}.kt"):
+            # Rename the file with defaultApplicationClassNameInAndroidProject to the project name and add "Application" to the end
+            # if file.endswith(f"{defaultApplicationClassNameInAndroidProject}.kt"):
+            #     applicationFilePath = os.path.join(root, file)
+            #     newApplicationFilePath = os.path.join(root, f"{userDefinedProjectName}Application.kt")
+            #
+            #     os.rename(applicationFilePath, newApplicationFilePath)
+            #
+            #     print(f"Renamed {applicationFilePath} to {newApplicationFilePath}")
+
+            # Rename the class name in the file to the project name
+            if file.endswith(f"{defaultApplicationClassNameInAndroidProject}.kt"):
                 applicationFilePath = os.path.join(root, file)
 
                 # What does this code do?
@@ -47,8 +56,8 @@ def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:
                     file_contents = f.read()
 
                     # If the file contains the default application class name then rename it to the user defined project name and add "Application" to the end
-                    if applicationClassNameInAndroidProject in file_contents:
-                        file_contents = file_contents.replace(applicationClassNameInAndroidProject, f'{userDefinedProjectName}Application')
+                    if defaultApplicationClassNameInAndroidProject in file_contents:
+                        file_contents = file_contents.replace(defaultApplicationClassNameInAndroidProject, f'{userDefinedProjectName}Application')
 
                         print(f"Renamed class name in {applicationFilePath} with {userDefinedProjectName}Application")
 
@@ -121,6 +130,21 @@ def renamePackageNameInFiles(dotNotationPackageName:str, userDefinedProjectName:
                         with open(xmlFile, 'w') as f:
                             f.write(file_contents)
 
+def renameApplicationClassFileName(userDefinedProjectName:str):
+
+    print(f"Renaming application class file name to {userDefinedProjectName}Application.kt")
+    for root, dirs, files in os.walk(rootDir):
+        for file in files:
+
+            if file.endswith(f"{defaultApplicationClassNameInAndroidProject}.kt"):
+                applicationFilePath = os.path.join(root, file)
+                newApplicationFilePath = os.path.join(root, f"{userDefinedProjectName}Application.kt")
+
+                os.rename(applicationFilePath, newApplicationFilePath)
+
+                print(f"Renamed {applicationFilePath} to {newApplicationFilePath}")
+
+
 def createFreshDirectories(rootFolder:str, sourceFolder:str, destinationFolder:str, deleteComFolderFor:str):
     print(f"SourceFolder path: {sourceFolder}")
     print(f"Creating path: {destinationFolder} \n")
@@ -184,6 +208,10 @@ feedTargetFoldersForCreation(
 renamePackageNameInFiles(
     dotNotationPackageName = userDefinedPackageName,
     userDefinedProjectName = appName
+)
+
+renameApplicationClassFileName(
+    userDefinedProjectName=appName
 )
 
 # Delete the folder that contains this script
